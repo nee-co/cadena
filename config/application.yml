@@ -1,0 +1,11 @@
+defaults: &defaults
+  cuenta_url: <%= ENV['CADENA_CUENTA_URL'] %>
+
+development:
+  <<: *defaults
+
+test:
+  <<: *defaults
+
+production:
+  <<: *defaults
