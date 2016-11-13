@@ -1,6 +1,12 @@
-development:
+default: &default
   type: server_db
-  url: http://localhost:7474
+  url: <%= ENV['CADENA_DATABASE_URL'] || 'http://neo4j:neo4j@localhost:7687' %>
+
 test:
-  type: server_db
-  url: http://localhost:7575
+  <<: *default
+
+development:
+  <<: *default
+
+production:
+  <<: *default
