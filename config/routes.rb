@@ -1,3 +1,19 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
+  resources :groups, { format: 'json', except: %i(destroy) } do
+    collection do
+      get :search
+    end
+    member do
+      post :join
+      post :left
+      post :invite
+      post :reject
+      post :cencel
+      put :folder
+    end
+  end
+
+  namespace :internal, { format: 'json' } do
+    resources :groups, only: %i(index show)
+  end
 end
