@@ -1,7 +1,7 @@
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show)
-  before_action :validate_member!, only: %i(show)
+  before_action :set_group, only: %i(show update)
+  before_action :validate_member!, only: %i(show update)
 
   def index
     @groups = current_user.groups
@@ -27,6 +27,13 @@ class GroupsController < ApplicationController
       users.each { |user| InviteRel.create(from_node: @group, to_node: user) }
       JoinRel.create(from_node: current_user, to_node: @group)
       render status: :created
+    else
+      head :unprocessable_entity
+    end
+  end
+
+  def update
+    if @group.update(group_params)
     else
       head :unprocessable_entity
     end
