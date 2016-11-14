@@ -2,6 +2,8 @@ class Group
   include Neo4j::ActiveNode
   include Neo4j::Timestamps
 
+  PERMITTED_ATTRIBUTES = %i(name is_private note group_image).freeze
+
   property :name
   property :note
   property :is_private, type: Boolean
