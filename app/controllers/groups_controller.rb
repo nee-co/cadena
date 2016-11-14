@@ -1,7 +1,7 @@
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update join left)
-  before_action :validate_member!, only: %i(show update left)
+  before_action :set_group, only: %i(show update join left invite)
+  before_action :validate_member!, only: %i(show update left invite)
   before_action :validate_no_member!, only: %i(join)
 
   def index
@@ -55,6 +55,15 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
+  end
+
+  def invite
+    invitations = users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
+    if invitations.all?(&:valid?)
+      invitations.each(&:save)
+    else
+      head :unprocessable_entity
+    end
   end
 
   private
