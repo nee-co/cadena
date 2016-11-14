@@ -3,7 +3,6 @@ module Cuenta::ApiClient
 
   included do
     base_url Settings.cuenta_url
-    request_body_type :json
     perform_caching false
     whiny_missing true
   end
