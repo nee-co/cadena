@@ -1,4 +1,9 @@
 class GroupsController < ApplicationController
+  def index
+    @groups = current_user.groups
+    @invitations = current_user.invitations
+  end
+
   def create
     @group = Group.new(group_params)
     if @group.valid?
