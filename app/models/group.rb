@@ -13,4 +13,8 @@ class Group
 
   has_many :in, :users, model_class: :User, rel_class: :JoinRel
   has_many :out, :invitations, model_class: :User, rel_class: :InviteRel
+
+  scope :public, -> {
+    where(is_private: false)
+  }
 end

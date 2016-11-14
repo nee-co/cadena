@@ -1,4 +1,6 @@
 class GroupsController < ApplicationController
+  before_action :set_paginated_param!, only: %i(search)
+
   def index
     @groups = current_user.groups
     @invitations = current_user.invitations
@@ -14,6 +16,11 @@ class GroupsController < ApplicationController
     else
       head :unprocessable_entity
     end
+  end
+
+  def search
+    groups = Group.public.where(name: /.*#{params.fetch(:keyword)}.*/i)
+    @groups = Neo4j::Paginated.create_from(Group.public, @page, @per)
   end
 
   private
