@@ -1,7 +1,7 @@
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update join left invite reject cancel)
-  before_action :validate_member!, only: %i(show update left invite cancel)
+  before_action :set_group, only: %i(show update join left invite reject cancel folder)
+  before_action :validate_member!, only: %i(show update left invite cancel folder)
   before_action :validate_no_member!, only: %i(join reject)
 
   def index
@@ -78,6 +78,10 @@ class GroupsController < ApplicationController
     else
       head :not_found
     end
+  end
+
+  def folder
+    Caja::Folder.create(group_id: @group.id)
   end
 
   private
