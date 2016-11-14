@@ -55,6 +55,10 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
+    if @group.users.size == 0
+      @group.invitations.each_rel(&:destroy)
+      @group.destroy
+    end
   end
 
   def invite
