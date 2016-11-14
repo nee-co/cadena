@@ -8,7 +8,7 @@ Rails.application.routes.draw do
       post :left
       post :invite
       post :reject
-      post :cencel
+      post :cancel
       put :folder
     end
   end

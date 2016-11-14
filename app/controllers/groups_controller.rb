@@ -1,7 +1,7 @@
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update join left invite reject)
-  before_action :validate_member!, only: %i(show update left invite)
+  before_action :set_group, only: %i(show update join left invite reject cancel)
+  before_action :validate_member!, only: %i(show update left invite cancel)
   before_action :validate_no_member!, only: %i(join reject)
 
   def index
@@ -69,6 +69,15 @@ class GroupsController < ApplicationController
   def reject
     head_4xx and return unless current_user.in?(@group.invitations)
     @group.invitations.where(user_id: current_user.user_id).each_rel(&:destroy)
+  end
+
+  def cancel
+    users = @group.invitations.where(user_id: params.fetch(:user_id))
+    if users.size > 0
+      users.each_rel(&:destroy)
+    else
+      head :not_found
+    end
   end
 
   private
