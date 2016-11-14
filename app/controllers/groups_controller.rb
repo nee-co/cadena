@@ -58,6 +58,7 @@ class GroupsController < ApplicationController
     if @group.users.size == 0
       @group.invitations.each_rel(&:destroy)
       @group.destroy
+      Caja::Folder.cleanup(group_id: @group.id)
     end
   end
 
