@@ -82,7 +82,7 @@ class GroupsController < ApplicationController
   end
 
   def validate_no_member!
-    head_4xx if current_user.in?(@group.users)
+    head :forbidden if current_user.in?(@group.users)
   end
 
   def group_params
