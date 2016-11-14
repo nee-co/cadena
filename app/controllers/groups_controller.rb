@@ -1,7 +1,7 @@
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update join)
-  before_action :validate_member!, only: %i(show update)
+  before_action :set_group, only: %i(show update join left)
+  before_action :validate_member!, only: %i(show update left)
   before_action :validate_no_member!, only: %i(join)
 
   def index
@@ -51,6 +51,10 @@ class GroupsController < ApplicationController
     else
       head :not_found
     end
+  end
+
+  def left
+    current_user.groups.where(id: @group.id).each_rel(&:destroy)
   end
 
   private
