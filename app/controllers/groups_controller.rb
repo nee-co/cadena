@@ -1,7 +1,8 @@
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update)
+  before_action :set_group, only: %i(show update join)
   before_action :validate_member!, only: %i(show update)
+  before_action :validate_no_member!, only: %i(join)
 
   def index
     @groups = current_user.groups
@@ -44,6 +45,14 @@ class GroupsController < ApplicationController
     @groups = Neo4j::Paginated.create_from(Group.public, @page, @per)
   end
 
+  def join
+    if @group.public? || current_user.in?(@group.invitations)
+      JoinRel.create(from_node: current_user, to_node: @group)
+    else
+      head :not_found
+    end
+  end
+
   private
 
   def set_group
@@ -52,6 +61,10 @@ class GroupsController < ApplicationController
 
   def validate_member!
     head_4xx unless current_user.in?(@group.users)
+  end
+
+  def validate_no_member!
+    head_4xx if current_user.in?(@group.users)
   end
 
   def group_params

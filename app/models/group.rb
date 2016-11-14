@@ -17,4 +17,8 @@ class Group
   scope :public, -> {
     where(is_private: false)
   }
+
+  def public?
+    !is_private
+  end
 end
