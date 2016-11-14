@@ -1,8 +1,8 @@
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update join left invite)
+  before_action :set_group, only: %i(show update join left invite reject)
   before_action :validate_member!, only: %i(show update left invite)
-  before_action :validate_no_member!, only: %i(join)
+  before_action :validate_no_member!, only: %i(join reject)
 
   def index
     @groups = current_user.groups
@@ -64,6 +64,11 @@ class GroupsController < ApplicationController
     else
       head :unprocessable_entity
     end
+  end
+
+  def reject
+    head_4xx and return unless current_user.in?(@group.invitations)
+    @group.invitations.where(user_id: current_user.user_id).each_rel(&:destroy)
   end
 
   private
