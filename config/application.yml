@@ -1,6 +1,6 @@
 defaults: &defaults
-  cuenta_url: <%= ENV['CADENA_CUENTA_URL'] %>
-  caja_url: <%= ENV['CADENA_CAJA_URL'] %>
+  cuenta_url: <%= ENV['CUENTA_URL'] %>
+  caja_url: <%= ENV['CAJA_URL'] %>
 
 development:
   <<: *defaults

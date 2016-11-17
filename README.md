@@ -57,23 +57,8 @@ $ make image (もしくは docker pull registry.neec.xyz/neeco/cadena-applicatio
 
 # DB(Neo4j立ち上げ)
 $ make db
-```
 
-case 用途
-
-when 動作確認
-
-```
-# アプリ立ち上げ
-$ make app
-```
-
-when 開発環境
-```
-# 開発環境用の設定に上書き
-$ cp docker-compose.override.yml{.development,}
-
-# 立ち上げ && アタッチ
+# 立ち上げ
 $ docker-compose run -p 3000:3000 cadena-application ash
 ```
 end
