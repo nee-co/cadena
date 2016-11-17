@@ -12,13 +12,16 @@ services:
     networks:
       - cadena
   cadena-application:
-    image: registry.neec.xyz/neeco/cadena-application:latest
+    image: registry.neec.xyz/dev/cadena-application:latest
     environment:
       CADENA_PORT: 3000
       CADENA_DATABASE_URL: http://cadena-database:7474
-      CADENA_SECRET_KEY_BASE: 1f0bef8714009078799cf781b489f5012c625a12dc4478388634af4b784b72c5bd1e3f2630a361af351cfaf5bf84559f818b2796b9fcbc331cfa404a3805cb6f
-      CADENA_CUENTA_URL: http://cuenta-application:4000/
-      CADENA_CAJA_URL: http://caja-application:9000/
+      CADENA_SECRET_KEY_BASE:
+      CUENTA_URL: http://cuenta-application:4000/
+      CAJA_URL: http://caja-application:9000/
+      RAILS_ENV: development
+    volumes:
+      - .:/app
     ports:
       - "3000:3000"
     depends_on:
