@@ -1,6 +1,7 @@
 defaults: &defaults
   cuenta_url: <%= ENV['CUENTA_URL'] %>
   caja_url: <%= ENV['CAJA_URL'] %>
+  static_url: <%= ENV['STATIC_URL'] %>
 
 development:
   <<: *defaults

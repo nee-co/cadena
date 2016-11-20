@@ -5,7 +5,7 @@ class GroupsController < ApplicationController
   before_action :validate_no_member!, only: %i(join reject)
 
   def index
-    @groups = current_user.groups
+    @groups = GroupDecorator.decorate_collection(current_user.groups)
     @invitations = current_user.invitations
   end
 
