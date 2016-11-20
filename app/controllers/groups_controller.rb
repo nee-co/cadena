@@ -25,7 +25,7 @@ class GroupsController < ApplicationController
     group = Group.new(group_params)
     if group.valid?
       group.save
-      users.each { |user| InviteRel.create(from_node: group, to_node: user) }
+      param_users.each { |user| InviteRel.create(from_node: group, to_node: user) }
       JoinRel.create(from_node: current_user, to_node: group)
       @group = GroupDecorator.new(group)
       render status: :created
@@ -72,7 +72,7 @@ class GroupsController < ApplicationController
   end
 
   def invite
-    invitations = users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
+    invitations = param_users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
     if invitations.all?(&:valid?)
       invitations.each(&:save)
     else
@@ -116,7 +116,7 @@ class GroupsController < ApplicationController
     params.permit(Group::PERMITTED_ATTRIBUTES)
   end
 
-  def users
+  def param_users
     params.fetch(:user_ids, []).uniq.map do |user_id|
       User.find_or_create_by(user_id: user_id)
     end
