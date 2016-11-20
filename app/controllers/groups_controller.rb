@@ -108,7 +108,7 @@ class GroupsController < ApplicationController
   end
 
   def users
-    params.fetch(:user_ids, {}).uniq.map do |user_id|
+    params.fetch(:user_ids, []).uniq.map do |user_id|
       User.find_or_create_by(user_id: user_id)
     end
   end
