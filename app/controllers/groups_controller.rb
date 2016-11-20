@@ -41,8 +41,15 @@ class GroupsController < ApplicationController
   end
 
   def search
-    groups = Group.public.where(name: /.*#{params.fetch(:keyword)}.*/i)
-    @groups = Neo4j::Paginated.create_from(Group.public, @page, @per)
+    query = Group.public.where(name: /.*#{params.fetch(:keyword)}.*/i)
+                 .query_as(:group)
+                 .match(user: "User {user_id: #{current_user.user_id}}")
+                 .where_not('(user)-[:join]->(group)')
+                 .where_not('(group)-[:invite]->(user)')
+
+    @total_count = query.count(:group)
+    groups = query.skip((@page - 1) * @per).limit(@per).pluck(:group)
+    @groups = GroupDecorator.decorate_collection(groups)
   end
 
   def join
