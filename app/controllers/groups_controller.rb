@@ -22,11 +22,12 @@ class GroupsController < ApplicationController
   end
 
   def create
-    @group = Group.new(group_params)
-    if @group.valid?
-      @group.save
-      users.each { |user| InviteRel.create(from_node: @group, to_node: user) }
-      JoinRel.create(from_node: current_user, to_node: @group)
+    group = Group.new(group_params)
+    if group.valid?
+      group.save
+      users.each { |user| InviteRel.create(from_node: group, to_node: user) }
+      JoinRel.create(from_node: current_user, to_node: group)
+      @group = GroupDecorator.new(group)
       render status: :created
     else
       head :unprocessable_entity
@@ -35,6 +36,7 @@ class GroupsController < ApplicationController
 
   def update
     if @group.update(group_params)
+      @group = GroupDecorator.new(@group)
     else
       head :unprocessable_entity
     end
@@ -99,7 +101,7 @@ class GroupsController < ApplicationController
   private
 
   def set_group
-    @group = Group.find(params[:id])
+    @group = GroupDecorator.new(Group.find(params[:id]))
   end
 
   def validate_member!

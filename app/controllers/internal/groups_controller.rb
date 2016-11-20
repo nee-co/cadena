@@ -4,7 +4,7 @@ class Internal::GroupsController < ApplicationController
 
   def index
     user = User.find_or_create_by(user_id: params.fetch(:user_id))
-    @groups = user.groups
+    @groups = GroupDecorator.decorate_collection(user.groups)
   end
 
   def show
