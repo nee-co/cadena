@@ -5,28 +5,29 @@ class GroupsController < ApplicationController
   before_action :validate_no_member!, only: %i(join reject)
 
   def index
-    @groups = current_user.groups
+    @groups = GroupDecorator.decorate_collection(current_user.groups)
     @invitations = current_user.invitations
   end
 
   def show
-    member_ids = @group.users.map(&:user_id)
+    member_ids = @group.members.map(&:user_id)
     invitation_ids = @group.invitations.map(&:user_id)
     user_ids = [member_ids, invitation_ids].flatten.uniq
     users = Cuenta::User.list(user_ids: user_ids).users
 
     @users = OpenStruct.new(
-      members: users.select { |u| member_ids.include?(u.user_id) },
-      invitations: users.select { |u| invitation_ids.include?(u.user_id) }
+      members: users.select { |u| member_ids.include?(u.id) },
+      invitations: users.select { |u| invitation_ids.include?(u.id) }
     )
   end
 
   def create
-    @group = Group.new(group_params)
-    if @group.valid?
-      @group.save
-      users.each { |user| InviteRel.create(from_node: @group, to_node: user) }
-      JoinRel.create(from_node: current_user, to_node: @group)
+    group = Group.new(group_params)
+    if group.valid?
+      group.save
+      param_users.each { |user| InviteRel.create(from_node: group, to_node: user) }
+      JoinRel.create(from_node: current_user, to_node: group)
+      @group = GroupDecorator.new(group)
       render status: :created
     else
       head :unprocessable_entity
@@ -35,14 +36,22 @@ class GroupsController < ApplicationController
 
   def update
     if @group.update(group_params)
+      @group = GroupDecorator.new(@group)
     else
       head :unprocessable_entity
     end
   end
 
   def search
-    groups = Group.public.where(name: /.*#{params.fetch(:keyword)}.*/i)
-    @groups = Neo4j::Paginated.create_from(Group.public, @page, @per)
+    query = Group.public.where(name: /.*#{params.fetch(:keyword)}.*/i)
+                 .query_as(:group)
+                 .match(user: "User {user_id: #{current_user.user_id}}")
+                 .where_not('(user)-[:join]->(group)')
+                 .where_not('(group)-[:invite]->(user)')
+
+    @total_count = query.count(:group)
+    groups = query.skip((@page - 1) * @per).limit(@per).pluck(:group)
+    @groups = GroupDecorator.decorate_collection(groups)
   end
 
   def join
@@ -55,7 +64,7 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
-    if @group.users.size == 0
+    if @group.members.size == 0
       @group.invitations.each_rel(&:destroy)
       @group.destroy
       Caja::Folder.cleanup(group_id: @group.id)
@@ -63,7 +72,7 @@ class GroupsController < ApplicationController
   end
 
   def invite
-    invitations = users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
+    invitations = param_users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
     if invitations.all?(&:valid?)
       invitations.each(&:save)
     else
@@ -92,23 +101,23 @@ class GroupsController < ApplicationController
   private
 
   def set_group
-    @group = Group.find(params[:id])
+    @group = GroupDecorator.new(Group.find(params[:id]))
   end
 
   def validate_member!
-    head_4xx unless current_user.in?(@group.users)
+    head_4xx unless current_user.in?(@group.members)
   end
 
   def validate_no_member!
-    head :forbidden if current_user.in?(@group.users)
+    head :forbidden if current_user.in?(@group.members)
   end
 
   def group_params
     params.permit(Group::PERMITTED_ATTRIBUTES)
   end
 
-  def users
-    params.fetch(:user_ids, {}).uniq.map do |user_id|
+  def param_users
+    params.fetch(:user_ids, []).uniq.map do |user_id|
       User.find_or_create_by(user_id: user_id)
     end
   end

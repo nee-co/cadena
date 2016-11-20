@@ -16,9 +16,10 @@ services:
     environment:
       CADENA_PORT: 3000
       CADENA_DATABASE_URL: http://cadena-database:7474
-      CADENA_SECRET_KEY_BASE:
+      CADENA_SECRET_KEY_BASE: x
       CUENTA_URL: http://cuenta-application:4000/
       CAJA_URL: http://caja-application:9000/
+      STATIC_URL: http://localhost
       RAILS_ENV: development
     volumes:
       - .:/app
@@ -33,13 +34,11 @@ services:
 
 volumes:
   cadena:
-    external:
-      name: neeco_cadena
+    driver: local
 
 networks:
   cadena:
-    external:
-      name: neeco_cadena
+    driver: bridge
   cadena-cuenta:
     external:
       name: neeco_cadena-cuenta

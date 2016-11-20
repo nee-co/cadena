@@ -4,11 +4,11 @@ class Internal::GroupsController < ApplicationController
 
   def index
     user = User.find_or_create_by(user_id: params.fetch(:user_id))
-    @groups = user.groups
+    @groups = GroupDecorator.decorate_collection(user.groups)
   end
 
   def show
-    render json: { "member_ids": @group.users.map(&:user_id) }
+    render json: { "member_ids": @group.members.map(&:user_id) }
   end
 
   private

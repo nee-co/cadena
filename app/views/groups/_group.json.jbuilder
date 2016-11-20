@@ -1,2 +1,1 @@
-json.group_id group.id
-json.extract! group, *%i(name note is_private group_image)
+json.extract! group, *%i(id name note is_private image)

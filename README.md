@@ -49,19 +49,15 @@ $ git remote update
 # ネットワーク作成
 $ make networks
 
-# ボリューム作成
-$ make volumes
-
-# イメージ作成 or 取得
-$ make image (もしくは docker pull registry.neec.xyz/neeco/cadena-application:latest)
+# イメージ取得
+$ docker-compose pull
 
 # DB(Neo4j立ち上げ)
 $ make db
 
-# 立ち上げ
-$ docker-compose run -p 3000:3000 cadena-application ash
+# 環境立ち上げ & ログイン
+$ make app
 ```
-end
 
 ### ブランチ管理
 - `master` : 安定状態を維持する。直接コミットはしない。
