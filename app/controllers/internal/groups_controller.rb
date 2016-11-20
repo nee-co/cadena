@@ -8,7 +8,7 @@ class Internal::GroupsController < ApplicationController
   end
 
   def show
-    render json: { "member_ids": @group.users.map(&:user_id) }
+    render json: { "member_ids": @group.members.map(&:user_id) }
   end
 
   private

@@ -10,7 +10,7 @@ class GroupsController < ApplicationController
   end
 
   def show
-    member_ids = @group.users.map(&:user_id)
+    member_ids = @group.members.map(&:user_id)
     invitation_ids = @group.invitations.map(&:user_id)
     user_ids = [member_ids, invitation_ids].flatten.uniq
     users = Cuenta::User.list(user_ids: user_ids).users
@@ -55,7 +55,7 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
-    if @group.users.size == 0
+    if @group.members.size == 0
       @group.invitations.each_rel(&:destroy)
       @group.destroy
       Caja::Folder.cleanup(group_id: @group.id)
@@ -96,11 +96,11 @@ class GroupsController < ApplicationController
   end
 
   def validate_member!
-    head_4xx unless current_user.in?(@group.users)
+    head_4xx unless current_user.in?(@group.members)
   end
 
   def validate_no_member!
-    head :forbidden if current_user.in?(@group.users)
+    head :forbidden if current_user.in?(@group.members)
   end
 
   def group_params

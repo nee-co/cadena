@@ -12,7 +12,7 @@ class InviteRel
   private
 
   def no_member
-    errors.add(:to_node) if to_node.in?(from_node.users)
+    errors.add(:to_node) if to_node.in?(from_node.members)
   end
 
   def no_invited

@@ -11,7 +11,7 @@ class Group
 
   validates :name, presence: true
 
-  has_many :in, :users, model_class: :User, rel_class: :JoinRel
+  has_many :in, :members, model_class: :User, rel_class: :JoinRel
   has_many :out, :invitations, model_class: :User, rel_class: :InviteRel
 
   scope :public, -> {
