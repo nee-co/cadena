@@ -16,8 +16,8 @@ class GroupsController < ApplicationController
     users = Cuenta::User.list(user_ids: user_ids).users
 
     @users = OpenStruct.new(
-      members: users.select { |u| member_ids.include?(u.user_id) },
-      invitations: users.select { |u| invitation_ids.include?(u.user_id) }
+      members: users.select { |u| member_ids.include?(u.id) },
+      invitations: users.select { |u| invitation_ids.include?(u.id) }
     )
   end
 
