@@ -11,15 +11,7 @@ class GroupsController < ApplicationController
   end
 
   def show
-    member_ids = @group.members.map(&:user_id)
-    invitation_ids = @group.invitations.map(&:user_id)
-    user_ids = [member_ids, invitation_ids].flatten.uniq
-    users = Cuenta::User.list(user_ids: user_ids).users
-
-    @users = OpenStruct.new(
-      members: users.select { |u| member_ids.include?(u.id) },
-      invitations: users.select { |u| invitation_ids.include?(u.id) }
-    )
+    @users = fetch_group_users
   end
 
   def create
@@ -65,11 +57,10 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
-    if @group.members.empty?
-      @group.invitations.each_rel(&:destroy)
-      @group.destroy
-      Caja::Folder.cleanup(group_id: @group.id)
-    end
+    return unless @group.members.empty?
+    @group.invitations.each_rel(&:destroy)
+    @group.destroy
+    Caja::Folder.cleanup(group_id: @group.id)
   end
 
   def invite
@@ -88,7 +79,7 @@ class GroupsController < ApplicationController
 
   def cancel
     users = @group.invitations.where(user_id: params.fetch(:user_id))
-    if !users.empty?
+    if users.present?
       users.each_rel(&:destroy)
     else
       head :not_found
@@ -103,6 +94,17 @@ class GroupsController < ApplicationController
 
   def set_group
     @group = GroupDecorator.new(Group.find(params[:id]))
+  end
+
+  def fetch_group_users
+    member_ids = @group.members.map(&:user_id)
+    invitation_ids = @group.invitations.map(&:user_id)
+    users = Cuenta::User.list(user_ids: [member_ids, invitation_ids].uniq).users
+
+    OpenStruct.new(
+      members: users.select { |u| member_ids.include?(u.id) },
+      invitations: users.select { |u| invitation_ids.include?(u.id) }
+    )
   end
 
   def validate_member!
