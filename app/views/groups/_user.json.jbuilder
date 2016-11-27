@@ -1,4 +1,5 @@
-json.extract! user, *%i(id name number image note)
+# frozen_string_literal: true
+json.extract! user, :id, :name, :number, :image, :note
 
 json.college do
   json.name user.college.name

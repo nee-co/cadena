@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class InviteRel
   include Neo4j::ActiveRel
 
