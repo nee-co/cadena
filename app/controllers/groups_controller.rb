@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
   before_action :set_group, only: %i(show update join left invite reject cancel folder)
@@ -64,7 +65,7 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
-    if @group.members.size == 0
+    if @group.members.empty?
       @group.invitations.each_rel(&:destroy)
       @group.destroy
       Caja::Folder.cleanup(group_id: @group.id)
@@ -87,7 +88,7 @@ class GroupsController < ApplicationController
 
   def cancel
     users = @group.invitations.where(user_id: params.fetch(:user_id))
-    if users.size > 0
+    if !users.empty?
       users.each_rel(&:destroy)
     else
       head :not_found

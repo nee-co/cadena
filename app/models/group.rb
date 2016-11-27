@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class Group
   include Neo4j::ActiveNode
   include Neo4j::Timestamps
