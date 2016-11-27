@@ -1,0 +1,42 @@
+AllCops:
+  TargetRubyVersion: 2.3
+  Exclude:
+    - Vagrantfile
+    - config/**/*
+    - lib/task/*.rake
+    - vender/gems/**/*
+
+Rails:
+  Enabled: true
+
+Rails/HasAndBelongsToMany:
+  Enabled: false
+
+# Use only ascii symbols in identifiers.
+Style/AsciiComments:
+  Enabled: false
+
+# Document classes and non-namespace modules.
+Style/Documentation:
+  Enabled: false
+
+# Use &&/|| instead of and/or.
+Style/AndOr:
+  Enabled: false
+
+# Use the lambda method for multi-line lambdas.
+Style/Lambda:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# Limit lines to 79 characters.
+Metrics/LineLength:
+  Max: 79
+  Enabled: false
+
+# Avoid methods longer than 20 lines of code.
+Metrics/MethodLength:
+  Max: 20
+  Enabled: true
