@@ -13,4 +13,5 @@ app:
 
 networks:
 	@docker network create neeco_cadena-cuenta || true
-	@docker network create neeco_cadena-caja || true
+	@docker network create neeco_cadena-imagen || true
+	@docker network create neeco_caja-cadena || true
