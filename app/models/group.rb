@@ -22,4 +22,8 @@ class Group
   def public?
     !is_private
   end
+
+  def self.default_image
+    File.open("#{Rails.root}/app/assets/images/default.png")
+  end
 end
