@@ -16,8 +16,7 @@ class GroupsController < ApplicationController
 
   def create
     group = Group.new(group_params)
-    if group.valid?
-      group.save
+    if group.save
       param_users.each { |user| InviteRel.create(from_node: group, to_node: user) }
       JoinRel.create(from_node: current_user, to_node: group)
       @group = GroupDecorator.new(group)

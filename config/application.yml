@@ -1,7 +1,8 @@
 defaults: &defaults
   cuenta_url: <%= ENV['CUENTA_URL'] %>
   caja_url: <%= ENV['CAJA_URL'] %>
-  static_url: <%= ENV['STATIC_URL'] %>
+  imagen_url: <%= ENV['IMAGEN_URL'] %>
+  static_image_url: <%= ENV['STATIC_IMAGE_URL'] %>
 
 development:
   <<: *defaults

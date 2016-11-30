@@ -11,6 +11,9 @@ class Group
   property :image
 
   validates :name, presence: true
+  validates :image, presence: true
+
+  before_validation :upload_image, if: -> { new_record? || image_changed? }
 
   has_many :in, :members, model_class: :User, rel_class: :JoinRel
   has_many :out, :invitations, model_class: :User, rel_class: :InviteRel
@@ -21,6 +24,11 @@ class Group
 
   def public?
     !is_private
+  end
+
+  def upload_image
+    upload_image = image || self.class.default_image
+    self.image = Imagen::Image.upload(upload_image, image_was)
   end
 
   def self.default_image
