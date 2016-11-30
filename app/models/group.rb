@@ -14,6 +14,7 @@ class Group
   validates :image, presence: true
 
   before_validation :upload_image, if: -> { new_record? || image_changed? }
+  after_destroy :cleanup
 
   has_many :in, :members, model_class: :User, rel_class: :JoinRel
   has_many :out, :invitations, model_class: :User, rel_class: :InviteRel
@@ -29,6 +30,12 @@ class Group
   def upload_image
     upload_image = image || self.class.default_image
     self.image = Imagen::Image.upload(upload_image, image_was)
+  end
+
+  def cleanup
+    invitations.each_rel(&:destroy)
+    Caja::Folder.cleanup(group_id: id)
+    Imagen::Image.delete(image_name: image)
   end
 
   def self.default_image

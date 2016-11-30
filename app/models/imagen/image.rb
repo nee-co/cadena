@@ -1,5 +1,9 @@
 # frozen_string_literal: true
-class Imagen::Image
+class Imagen::Image < Flexirest::Base
+  include Imagen::ApiClient
+
+  delete :delete, '/internal/images/:image_name'
+
   def self.upload(image, image_name = nil)
     response = if image_name.nil?
                  conn.post('/internal/images', image_param(image))

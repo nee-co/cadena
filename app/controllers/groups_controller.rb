@@ -56,10 +56,7 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
-    return unless @group.members.empty?
-    @group.invitations.each_rel(&:destroy)
-    @group.destroy
-    Caja::Folder.cleanup(group_id: @group.id)
+    @group.destroy if @group.members.empty?
   end
 
   def invite
