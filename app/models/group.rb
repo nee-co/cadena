@@ -39,6 +39,6 @@ class Group
   end
 
   def self.default_image
-    File.open("#{Rails.root}/app/assets/images/default.png")
+    File.open(Rails.root.join("files/default.png"))
   end
 end
