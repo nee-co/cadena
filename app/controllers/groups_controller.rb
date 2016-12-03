@@ -112,7 +112,7 @@ class GroupsController < ApplicationController
   end
 
   def group_params
-    params.permit(Group::PERMITTED_ATTRIBUTES)
+    params.permit(Group::PERMITTED_ATTRIBUTES).merge(upload_image: params.fetch(:image, {}))
   end
 
   def param_users
