@@ -19,7 +19,8 @@ services:
       CADENA_SECRET_KEY_BASE: x
       CUENTA_URL: http://cuenta-application:4000/
       CAJA_URL: http://caja-application:9000/
-      STATIC_URL: http://localhost
+      IMAGEN_URL: http://imagen-application:8000/
+      STATIC_IMAGE_URL: http://localhost/images/
       RAILS_ENV: development
     volumes:
       - .:/app
@@ -30,7 +31,8 @@ services:
     networks:
       - cadena
       - cadena-cuenta
-      - cadena-caja
+      - cadena-imagen
+      - caja-cadena
 
 volumes:
   cadena:
@@ -42,6 +44,9 @@ networks:
   cadena-cuenta:
     external:
       name: neeco_cadena-cuenta
-  cadena-caja:
+  cadena-imagen:
     external:
-      name: neeco_cadena-caja
+      name: neeco_cadena-imagen
+  caja-cadena:
+    external:
+      name: neeco_caja-cadena

@@ -16,8 +16,7 @@ class GroupsController < ApplicationController
 
   def create
     group = Group.new(group_params)
-    if group.valid?
-      group.save
+    if group.save
       param_users.each { |user| InviteRel.create(from_node: group, to_node: user) }
       JoinRel.create(from_node: current_user, to_node: group)
       @group = GroupDecorator.new(group)
@@ -57,10 +56,7 @@ class GroupsController < ApplicationController
 
   def left
     current_user.groups.where(id: @group.id).each_rel(&:destroy)
-    return unless @group.members.empty?
-    @group.invitations.each_rel(&:destroy)
-    @group.destroy
-    Caja::Folder.cleanup(group_id: @group.id)
+    @group.destroy if @group.members.empty?
   end
 
   def invite
@@ -116,7 +112,7 @@ class GroupsController < ApplicationController
   end
 
   def group_params
-    params.permit(Group::PERMITTED_ATTRIBUTES)
+    params.permit(Group::PERMITTED_ATTRIBUTES).merge(upload_image: params.fetch(:image, {}))
   end
 
   def param_users
