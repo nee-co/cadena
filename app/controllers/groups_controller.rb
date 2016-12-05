@@ -87,7 +87,7 @@ class GroupsController < ApplicationController
   end
 
   def folder
-    Caja::Folder.create(group_id: @group.id)
+    Caja::Folder.create(group_id: @group.id, user_id: current_user.user_id)
   end
 
   private
