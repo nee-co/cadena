@@ -37,7 +37,7 @@ class GroupsController < ApplicationController
   def search
     query = Group.public.where(name: /.*#{params.fetch(:keyword)}.*/i)
                  .query_as(:group)
-                 .match(user: "User {user_id: #{current_user.user_id}}")
+                 .match(user: "User {user_id: #{current_user.user_id}}".dup)
                  .where_not('(user)-[:join]->(group)')
                  .where_not('(group)-[:invite]->(user)')
 
