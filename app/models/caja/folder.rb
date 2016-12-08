@@ -4,6 +4,6 @@ module Caja
     include Caja::ApiClient
 
     post :create, '/internal/folders'
-    post :cleanup, '/internal/cleanup'
+    post :cleanup, '/internal/folders/cleanup'
   end
 end
