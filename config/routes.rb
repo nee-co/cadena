@@ -9,7 +9,6 @@ Rails.application.routes.draw do
       post :invite
       post :reject
       post :cancel
-      put :folder
     end
   end
 
