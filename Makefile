@@ -1,9 +1,4 @@
-REVISION=`git rev-parse HEAD`
-
-.PHONY: image db app migrate networks
-
-image:
-	docker build --tag cadena-application --build-arg REVISION=$(REVISION) .
+.PHONY: db app migrate networks
 
 db:
 	docker-compose up -d cadena-database
