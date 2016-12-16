@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update join left invite reject cancel)
-  before_action :validate_member!, only: %i(show update left invite cancel)
+  before_action :set_group, only: %i(show update members invitations join left invite reject cancel)
+  before_action :validate_private_info!, only: %i(show members)
+  before_action :validate_member!, only: %i(update invitations left invite cancel)
   before_action :validate_no_member!, only: %i(join reject)
 
   def index
@@ -10,9 +11,7 @@ class GroupsController < ApplicationController
     @invitations = current_user.invitations
   end
 
-  def show
-    @users = fetch_group_users
-  end
+  def show; end
 
   def create
     group = Group.new(group_params)
@@ -45,6 +44,14 @@ class GroupsController < ApplicationController
     @total_count = query.count(:group)
     groups = query.skip((@page - 1) * @per).limit(@per).pluck(:group)
     @groups = GroupDecorator.decorate_collection(groups)
+  end
+
+  def members
+    @members = Cuenta::User.list(user_ids: @group.members.map(&:user_id).uniq).users
+  end
+
+  def invitations
+    @invitations = Cuenta::User.list(user_ids: @group.invitations.map(&:user_id).uniq).users
   end
 
   def join
@@ -89,15 +96,8 @@ class GroupsController < ApplicationController
     @group = GroupDecorator.new(Group.find(params[:id]))
   end
 
-  def fetch_group_users
-    member_ids = @group.members.map(&:user_id)
-    invitation_ids = @group.invitations.map(&:user_id)
-    users = Cuenta::User.list(user_ids: [member_ids, invitation_ids].uniq).users
-
-    OpenStruct.new(
-      members: users.select { |u| member_ids.include?(u.id) },
-      invitations: users.select { |u| invitation_ids.include?(u.id) }
-    )
+  def validate_private_info!
+    head_4xx if @group.is_private && !current_user.in?(@group.members) && !@group.invitations.where(user_id: current_user.user_id).exists?
   end
 
   def validate_member!

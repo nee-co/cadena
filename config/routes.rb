@@ -4,6 +4,8 @@ Rails.application.routes.draw do
       get :search
     end
     member do
+      get :members
+      get :invitations
       post :join
       post :left
       post :invite
