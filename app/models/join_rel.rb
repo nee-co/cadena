@@ -11,6 +11,6 @@ class JoinRel
   private
 
   def remove_invite
-    to_node.invitations.where(user_id: from_node.user_id).each_rel(&:destroy)
+    to_node.invitees.where(user_id: from_node.user_id).each_rel(&:destroy)
   end
 end

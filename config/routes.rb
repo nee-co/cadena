@@ -5,7 +5,7 @@ Rails.application.routes.draw do
     end
     member do
       get :members
-      get :invitations
+      get :invitees
       post :join
       post :left
       post :invite

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update members invitations join left invite reject cancel)
+  before_action :set_group, only: %i(show update members invitees join left invite reject cancel)
   before_action :validate_private_info!, only: %i(show members)
-  before_action :validate_member!, only: %i(update invitations left invite cancel)
+  before_action :validate_member!, only: %i(update invitees left invite cancel)
   before_action :validate_no_member!, only: %i(join reject)
 
   def index
@@ -50,12 +50,12 @@ class GroupsController < ApplicationController
     @members = Cuenta::User.list(user_ids: @group.members.map(&:user_id).uniq).users
   end
 
-  def invitations
-    @invitations = Cuenta::User.list(user_ids: @group.invitations.map(&:user_id).uniq).users
+  def invitees
+    @invitees = Cuenta::User.list(user_ids: @group.invitees.map(&:user_id).uniq).users
   end
 
   def join
-    if @group.public? || current_user.in?(@group.invitations)
+    if @group.public? || current_user.in?(@group.invitees)
       JoinRel.create(from_node: current_user, to_node: @group)
     else
       head :not_found
@@ -68,21 +68,21 @@ class GroupsController < ApplicationController
   end
 
   def invite
-    invitations = param_users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
-    if invitations.all?(&:valid?)
-      invitations.each(&:save)
+    invitees = param_users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
+    if invitees.all?(&:valid?)
+      invitees.each(&:save)
     else
       head :unprocessable_entity
     end
   end
 
   def reject
-    head_4xx and return unless current_user.in?(@group.invitations)
-    @group.invitations.where(user_id: current_user.user_id).each_rel(&:destroy)
+    head_4xx and return unless current_user.in?(@group.invitees)
+    @group.invitees.where(user_id: current_user.user_id).each_rel(&:destroy)
   end
 
   def cancel
-    users = @group.invitations.where(user_id: params.fetch(:user_id))
+    users = @group.invitees.where(user_id: params.fetch(:user_id))
     if users.present?
       users.each_rel(&:destroy)
     else
@@ -97,7 +97,7 @@ class GroupsController < ApplicationController
   end
 
   def validate_private_info!
-    head_4xx if @group.is_private && !current_user.in?(@group.members) && !@group.invitations.where(user_id: current_user.user_id).exists?
+    head_4xx if @group.is_private && !current_user.in?(@group.members) && !@group.invitees.where(user_id: current_user.user_id).exists?
   end
 
   def validate_member!
