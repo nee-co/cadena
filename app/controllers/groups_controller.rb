@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 class GroupsController < ApplicationController
   before_action :set_paginated_param!, only: %i(search)
-  before_action :set_group, only: %i(show update join left invite reject cancel folder)
-  before_action :validate_member!, only: %i(show update left invite cancel folder)
+  before_action :set_group, only: %i(show update members invitees join left invite reject cancel)
+  before_action :validate_private_info!, only: %i(show members)
+  before_action :validate_member!, only: %i(update invitees left invite cancel)
   before_action :validate_no_member!, only: %i(join reject)
 
   def index
@@ -10,15 +11,14 @@ class GroupsController < ApplicationController
     @invitations = current_user.invitations
   end
 
-  def show
-    @users = fetch_group_users
-  end
+  def show; end
 
   def create
     group = Group.new(group_params)
     if group.save
       param_users.each { |user| InviteRel.create(from_node: group, to_node: user) }
       JoinRel.create(from_node: current_user, to_node: group)
+      Caja::Folder.create(group_id: group.id, user_id: current_user.user_id)
       @group = GroupDecorator.new(group)
       render status: :created
     else
@@ -46,8 +46,16 @@ class GroupsController < ApplicationController
     @groups = GroupDecorator.decorate_collection(groups)
   end
 
+  def members
+    @members = Cuenta::User.list(user_ids: @group.members.map(&:user_id).uniq).users
+  end
+
+  def invitees
+    @invitees = Cuenta::User.list(user_ids: @group.invitees.map(&:user_id).uniq).users
+  end
+
   def join
-    if @group.public? || current_user.in?(@group.invitations)
+    if @group.public? || current_user.in?(@group.invitees)
       JoinRel.create(from_node: current_user, to_node: @group)
     else
       head :not_found
@@ -60,30 +68,26 @@ class GroupsController < ApplicationController
   end
 
   def invite
-    invitations = param_users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
-    if invitations.all?(&:valid?)
-      invitations.each(&:save)
+    invitees = param_users.map { |user| InviteRel.new(from_node: @group, to_node: user) }
+    if invitees.all?(&:valid?)
+      invitees.each(&:save)
     else
       head :unprocessable_entity
     end
   end
 
   def reject
-    head_4xx and return unless current_user.in?(@group.invitations)
-    @group.invitations.where(user_id: current_user.user_id).each_rel(&:destroy)
+    head_4xx and return unless current_user.in?(@group.invitees)
+    @group.invitees.where(user_id: current_user.user_id).each_rel(&:destroy)
   end
 
   def cancel
-    users = @group.invitations.where(user_id: params.fetch(:user_id))
+    users = @group.invitees.where(user_id: params.fetch(:user_id))
     if users.present?
       users.each_rel(&:destroy)
     else
       head :not_found
     end
-  end
-
-  def folder
-    Caja::Folder.create(group_id: @group.id, user_id: current_user.user_id)
   end
 
   private
@@ -92,15 +96,8 @@ class GroupsController < ApplicationController
     @group = GroupDecorator.new(Group.find(params[:id]))
   end
 
-  def fetch_group_users
-    member_ids = @group.members.map(&:user_id)
-    invitation_ids = @group.invitations.map(&:user_id)
-    users = Cuenta::User.list(user_ids: [member_ids, invitation_ids].uniq).users
-
-    OpenStruct.new(
-      members: users.select { |u| member_ids.include?(u.id) },
-      invitations: users.select { |u| invitation_ids.include?(u.id) }
-    )
+  def validate_private_info!
+    head_4xx if @group.is_private && !current_user.in?(@group.members) && !@group.invitees.where(user_id: current_user.user_id).exists?
   end
 
   def validate_member!

@@ -20,7 +20,7 @@ class Group
   after_destroy :cleanup
 
   has_many :in, :members, model_class: :User, rel_class: :JoinRel
-  has_many :out, :invitations, model_class: :User, rel_class: :InviteRel
+  has_many :out, :invitees, model_class: :User, rel_class: :InviteRel
 
   scope :public, -> {
     where(is_private: false)
@@ -45,7 +45,7 @@ class Group
   end
 
   def cleanup
-    invitations.each_rel(&:destroy)
+    invitees.each_rel(&:destroy)
     Caja::Folder.cleanup(group_id: id)
     Imagen::Image.delete(image_name: image)
   end

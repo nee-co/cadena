@@ -5,4 +5,8 @@ class GroupDecorator < Draper::Decorator
   def image
     File.join(Settings.static_image_url, object.image)
   end
+
+  def folder_id
+    Caja::Folder.top_id(group_id: object.id).id
+  end
 end

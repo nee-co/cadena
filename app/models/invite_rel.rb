@@ -17,6 +17,6 @@ class InviteRel
   end
 
   def no_invited
-    errors.add(:to_node) if to_node.in?(from_node.invitations)
+    errors.add(:to_node) if to_node.in?(from_node.invitees)
   end
 end

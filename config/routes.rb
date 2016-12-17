@@ -4,12 +4,13 @@ Rails.application.routes.draw do
       get :search
     end
     member do
+      get :members
+      get :invitees
       post :join
       post :left
       post :invite
       post :reject
       post :cancel
-      put :folder
     end
   end
 
