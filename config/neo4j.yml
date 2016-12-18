@@ -1,5 +1,5 @@
 default: &default
-  type: server_db
+  type: http
   url: <%= ENV['CADENA_DATABASE_URL'] || 'http://neo4j:neo4j@localhost:7687' %>
 
 test:
