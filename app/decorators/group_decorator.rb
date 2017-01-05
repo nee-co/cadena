@@ -9,8 +9,4 @@ class GroupDecorator < Draper::Decorator
   def type
     "group"
   end
-
-  def folder_id
-    Caja::Folder.top_id(group_id: object.id).id
-  end
 end

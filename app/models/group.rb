@@ -30,6 +30,10 @@ class Group
     !is_private
   end
 
+  def folder_id
+    Caja::Folder.top_id(group_id: id).id
+  end
+
   def self.default_image
     File.open(Rails.root.join("files/default.png"))
   end
