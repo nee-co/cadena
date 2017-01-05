@@ -20,4 +20,10 @@ class ApplicationController < ActionController::API
     @page = params[:page].to_i
     @per = params[:per].to_i
   end
+
+  def set_limit_offset_param!
+    head :unprocessable_entity unless %i(limit offset).all?(&params.method(:include?))
+    @limit = params[:limit].to_i
+    @offset = params[:offset].to_i
+  end
 end

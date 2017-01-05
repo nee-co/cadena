@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
-  resources :groups, { format: 'json', except: %i(destroy) } do
+  resources :groups, { format: 'json', only: %i(show create update) } do
     collection do
+      get :index, controller: :tray
+      get :invitations, controller: :tray
       get :search
     end
     member do

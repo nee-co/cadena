@@ -6,11 +6,6 @@ class GroupsController < ApplicationController
   before_action :validate_member!, only: %i(update invitees left invite cancel)
   before_action :validate_no_member!, only: %i(join reject)
 
-  def index
-    @groups = GroupDecorator.decorate_collection(current_user.groups)
-    @invitations = current_user.invitations
-  end
-
   def show; end
 
   def create
