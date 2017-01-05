@@ -35,7 +35,7 @@ class Group
   end
 
   def self.default_image
-    File.open(Rails.root.join("files/default.png"))
+    File.open(Rails.root.join('files/default.png'))
   end
 
   private

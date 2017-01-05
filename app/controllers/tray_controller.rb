@@ -4,11 +4,11 @@ class TrayController < ApplicationController
 
   def index
     @elements = GroupDecorator.decorate_collection(current_user.groups.skip(@offset).limit(@limit))
-    render "elements"
+    render 'elements'
   end
 
   def invitations
     @elements = GroupDecorator.decorate_collection(current_user.invitations.skip(@offset).limit(@limit))
-    render "elements"
+    render 'elements'
   end
 end

@@ -7,6 +7,6 @@ class GroupDecorator < Draper::Decorator
   end
 
   def type
-    "group"
+    'group'
   end
 end
