@@ -10,7 +10,7 @@ services:
     volumes:
       - cadena:/data
     networks:
-      - cadena
+      - neeco
   cadena-application:
     image: registry.neec.xyz/dev/cadena-application:latest
     environment:
@@ -29,24 +29,13 @@ services:
     depends_on:
       - cadena-database
     networks:
-      - cadena
-      - cadena-cuenta
-      - cadena-imagen
-      - caja-cadena
+      - neeco
 
 volumes:
   cadena:
     driver: local
 
 networks:
-  cadena:
-    driver: bridge
-  cadena-cuenta:
+  neeco:
     external:
-      name: neeco_cadena-cuenta
-  cadena-imagen:
-    external:
-      name: neeco_cadena-imagen
-  caja-cadena:
-    external:
-      name: neeco_caja-cadena
+      name: neeco_develop
