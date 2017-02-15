@@ -47,7 +47,7 @@ $ git remote add upstream git@bitbucket.org:nhac/cadena.git
 $ git remote update
 
 # ネットワーク作成
-$ make networks
+$ make network
 
 # イメージ取得
 $ docker-compose pull
